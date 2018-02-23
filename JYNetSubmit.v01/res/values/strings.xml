@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="app_name">嘉友国际</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="wid">User ID</string>
+    <string name="wpwd">User Password</string>
+	
+    <string name="see">=</string>
+    <string name="success">Success</string>
+    <string name="fail">Fail</string>
+    <string name="nodata">No new data</string>
+    <string name="update">Data Updating</string>
+    <string name="ok">OK</string>
+    <string name="exit">Sign out</string>
+    <string name="back">Back</string>
+    <string name="delete">delete</string>
+    <string name="cancel" tools:ignore="ButtonCase">cancel</string>
+    
+    <string name="no">No</string>
+    <string name="complete">Please input complete</string>
+    <string name="login">Sign&#160;&#160;In</string>
+    
+    <string name="search">search</string>
+    <string name="code">Scan</string>
+    <string name="detail">Detail</string>
+    <string name="add">Submit</string>
+    
+    <string name="wait">Please wait</string>
+    <string name="doing">Doing</string>
+    <string name="kg">(kg)</string>
+    <string name="uppage">Previous</string>
+    <string name="downpage">Next</string>
+    <string name="scan_title">Please alignment Barcode/QR Code</string>
+    <string name="tip_null"> </string>
+    <string name="resign">resign</string>
+	<string name="truckinfo">Truck Information</string>
+    <string name="goodsinfo">Goods Information</string>
+    <string name="rq">Truck loading time</string>
+    <string name="xh">Container barcode</string>
+    <string name="zcid">Truck&#160;&#160;No.</string>
+    <string name="gcid">Trailer No.</string>
+    <string name="mz">Gross Weight</string>
+    <string name="jz">&#160;Net&#160;&#160;Weight&#160;&#160;</string>
+    <string name="sir">Driver Information</string>
+    <string name="dzkh">Electronic&#160;card</string>
+    <string name="sjxm">Driver&#160;&#160;name&#160;&#160;&#160;&#160;</string>
+    <string name="hzh">Driver&#160;passport</string>
+    <string name="qfh">&#160;Seal&#160;&#160;&#160;No.</string>
+    <string name="img">Upload Photos</string>
+    <string name="iadd">+</string>
+    <string name="ibook">view book</string>
+    
+</resources>
