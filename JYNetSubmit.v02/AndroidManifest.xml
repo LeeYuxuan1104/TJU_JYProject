@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.jynetsubmit"
+    android:versionCode="1"
+    android:versionName="1.0" xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-sdk
+        android:minSdkVersion="11"
+        tools:ignore="UsesMinSdkAttributes"/>
+    <!-- 01.添加网络的权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 02.访问网络的状态 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- 03.Android中写入SDCARD的权限 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- 04.文件系统存储的权限 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <!-- 05.1 Android中使用摄像机的权限 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- 05.2 Android中使用摄像机的硬件设备的权限 -->
+    <uses-feature android:name="android.hardware.camera" />
+    <!-- 05.3 Android中使用自动聚焦的权限 -->
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+    <!-- 06.GPS信息定位接口 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<!-- 07.手机振动 -->
+	<uses-permission android:name="android.permission.VIBRATE" />
+	
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/jy01"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.view.VWelActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" 
+            android:screenOrientation="portrait"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.view.VQueryActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" 
+            android:screenOrientation="portrait"
+            >
+        </activity>
+        <activity
+            android:name="com.view.VAddActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" 
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode = "stateAlwaysHidden|adjustPan"
+            >
+        </activity>
+        <activity
+            android:name="com.view.VFlushActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="com.view.VSetActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <!-- 注册服务包 :需要把相应的内容信息写清楚:包名称-->
+        <service android:name="com.controller.service.ReceiveDataService" >
+        </service>
+    </application>
+
+</manifest>
