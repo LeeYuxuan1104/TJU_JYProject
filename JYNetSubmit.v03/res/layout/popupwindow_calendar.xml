@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/icon_transparent" >
+
+    <LinearLayout
+        android:id="@+id/ll_popup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="90dp"
+        android:orientation="vertical"
+        tools:ignore="UselessParent" >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/shape_top" >
+
+            <RelativeLayout
+                android:id="@+id/popupwindow_calendar_last_month"
+                android:layout_width="20dp"
+                android:layout_height="55dp"
+                android:layout_alignParentLeft="true" >
+
+                <TextView
+                    android:layout_width="9dp"
+                    android:layout_height="14dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/bt_calendar_last" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/popupwindow_calendar_month"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_toRightOf="@id/popupwindow_calendar_last_month"
+                android:gravity="center"
+                android:textColor="#ffffff"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:id="@+id/popupwindow_calendar_next_month"
+                android:layout_width="20dp"
+                android:layout_height="55dp"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/popupwindow_calendar_month" >
+
+                <TextView
+                    android:layout_width="9dp"
+                    android:layout_height="14dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/bt_calendar_next" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@id/popupwindow_calendar_next_month" >
+
+                <RelativeLayout
+                    android:id="@+id/minute_next"
+                    android:layout_width="20dp"
+                    android:layout_height="55dp"
+                    android:clickable="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true" >
+
+                    <TextView
+                        android:layout_width="9dp"
+                        android:layout_height="14dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/bt_calendar_next" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/minute_num"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_toLeftOf="@id/minute_next"
+                    android:gravity="center"
+                    android:textColor="#ffffff"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:id="@+id/minute_last"
+                    android:layout_width="20dp"
+                    android:layout_height="55dp"
+                    android:clickable="true"
+                    android:layout_toLeftOf="@id/minute_num" >
+
+                    <TextView
+                        android:layout_width="9dp"
+                        android:layout_height="14dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/bt_calendar_last" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/divide"
+                    android:layout_width="40dp"
+                    android:layout_height="55dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/minute_last" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/divide" 
+                        android:textColor="#ffffff"
+                        android:textSize="18sp"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        />
+                </RelativeLayout>
+                 <RelativeLayout
+                    android:id="@+id/hour_next"
+                    android:layout_width="20dp"
+                    android:layout_height="55dp"
+                    android:clickable="true"
+                    android:layout_toLeftOf="@id/divide"
+                    android:layout_centerVertical="true" >
+
+                    <TextView
+                        android:layout_width="9dp"
+                        android:layout_height="14dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/bt_calendar_next" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/hour_num"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_toLeftOf="@id/hour_next"
+                    android:gravity="center"
+                    android:textColor="#ffffff"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:id="@+id/hour_last"
+                    android:layout_width="20dp"
+                    android:layout_height="55dp"
+                    android:clickable="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/hour_num" >
+
+                    <TextView
+                        android:layout_width="9dp"
+                        android:layout_height="14dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/bt_calendar_last" />
+                </RelativeLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <com.model.tool.view.KCalendar
+            android:id="@+id/popupwindow_calendar"
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:layout_gravity="center"
+            android:background="#d1eeee" >
+        </com.model.tool.view.KCalendar>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#bbcc3333" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_bottom2"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/popupwindow_calendar_bt_enter"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/done"
+                android:textColor="@drawable/btn04"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:id="@+id/includeTop"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        layout="@layout/act_topbar" />
+
+    <LinearLayout
+        android:id="@+id/layBottom"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/shape_bottom"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btnOk"
+            style="@style/button_style"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:background="@drawable/btn01"
+            android:text="@string/add" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/layBottom"
+        android:layout_below="@id/includeTop"
+        android:background="#ffffff"
+        android:scrollbars="vertical" >
+
+        <LinearLayout
+            android:id="@+id/linear"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical" >
+
+            <RelativeLayout style="@style/input_style_table" >
+
+                <TextView
+                    android:id="@+id/xhcode"
+                    style="@style/button_style_small"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/code" />
+
+                <com.model.tool.view.EditTextWithDel
+                    android:id="@+id/etxh"
+                    style="@style/input_style_EditTextWithDel"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/xhcode"
+                    android:hint="@string/xh"
+                    android:inputType="text" />
+            </RelativeLayout>
+
+            <LinearLayout style="@style/input_style_table" >
+
+                <com.model.tool.view.EditTextWithDel
+                    android:id="@+id/etrq"
+                    style="@style/input_style_EditTextWithDel"
+                    android:focusableInTouchMode="false"
+                    android:hint="@string/rq"
+                    android:inputType="time" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/text_style"
+                android:text="@string/truckinfo" />
+
+            <View style="@style/view_divide" />
+
+            <LinearLayout style="@style/input_style_table" >
+
+                <com.model.tool.view.EditTextWithDel
+                    android:id="@+id/etzcid"
+                    style="@style/input_style_EditTextWithDel"
+                    android:hint="@string/zcid"
+                    android:inputType="text" />
+            </LinearLayout>
+
+            <RelativeLayout style="@style/input_style_table" >
+
+                <TextView
+                    android:id="@+id/t2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/gcid"
+                    android:textColor="#8C8C8C"
+                    android:textSize="20sp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/gcidcode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/code"
+                    android:visibility="gone" />
+
+                <com.model.tool.view.EditTextWithDel
+                    android:id="@+id/etgcid"
+                    style="@style/input_style_EditTextWithDel"
+                    android:hint="@string/gcid"
+                    android:inputType="text" />
+            </RelativeLayout>
+
+            <RelativeLayout style="@style/input_style_table" >
+
+                <TextView
+                    android:id="@+id/t3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/qfh"
+                    android:textColor="#8C8C8C"
+                    android:textSize="20sp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/qfhcode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/code"
+                    android:visibility="gone" />
+
+                <com.model.tool.view.EditTextWithDel
+                    android:id="@+id/etqfh"
+                    style="@style/input_style_EditTextWithDel"
+                    android:hint="@string/qfh"
+                    android:inputType="text" />
+            </RelativeLayout>
+
+            <LinearLayout style="@style/input_style_table" >
+
+                <com.model.tool.view.EditTextWithDel
+                    android:id="@+id/etdzkh"
+                    style="@style/input_style_EditTextWithDel"
+                    android:hint="@string/dzkh"
+                    android:inputType="text" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/text_style"
+                android:text="@string/goodsinfo" />
+
+            <View style="@style/view_divide" />
+
+            <LinearLayout style="@style/input_style_table" >
+
+                <com.model.tool.view.EditTextWithDel
+                    android:id="@+id/etjz"
+                    style="@style/input_style_EditTextWithDel"
+                    android:hint="@string/jz"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/input_style_table" >
+
+                <com.model.tool.view.EditTextWithDel
+                    android:id="@+id/etmz"
+                    style="@style/input_style_EditTextWithDel"
+                    android:hint="@string/mz"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/text_style"
+                android:text="@string/sir" />
+
+            <View style="@style/view_divide" />
+
+            <LinearLayout style="@style/input_style_table" >
+
+                <com.model.tool.view.EditTextWithDel
+                    android:id="@+id/etsjxm"
+                    style="@style/input_style_EditTextWithDel"
+                    android:hint="@string/sjxm"
+                    android:inputType="text" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/input_style_table" >
+
+                <com.model.tool.view.EditTextWithDel
+                    android:id="@+id/ethzh"
+                    style="@style/input_style_EditTextWithDel"
+                    android:hint="@string/hzh"
+                    android:inputType="text" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:gravity="center"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/img"
+                    android:textColor="#000000"
+                    android:textSize="20sp" />
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:id="@+id/ibimage"
+                        style="@style/button_style_image"
+                        android:text="@string/iadd" />
+
+                    <TextView
+                        android:id="@+id/ibibook"
+                        style="@style/button_style_image"
+                        android:text="@string/ibook" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>
