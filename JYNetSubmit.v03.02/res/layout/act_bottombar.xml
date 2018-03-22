@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffffff" >
+
+    <LinearLayout
+        android:id="@+id/layButtom"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:background="#D1EEEE"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <Spinner
+            android:id="@+id/spPageCount"
+            android:layout_width="fill_parent"
+            android:layout_height="45sp"
+            android:layout_weight="1"
+            android:spinnerMode="dropdown"
+            android:theme="@style/customtitlebar" />
+
+        <Button
+            android:id="@+id/btnUpPage"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/uppage" />
+
+        <EditText
+            android:id="@+id/etPage"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:editable="false"
+            android:enabled="false"
+            android:gravity="center"
+            tools:ignore="TextFields,Deprecated" />
+
+        <Button
+            android:id="@+id/btnDownPage"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/downpage" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/laySearch"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" >
+
+        <Spinner
+            android:id="@+id/spKind"
+            android:layout_width="wrap_content"
+            android:layout_height="45sp"
+            android:layout_alignParentLeft="true"
+            android:spinnerMode="dropdown"
+            android:theme="@style/customtitlebar" />
+
+        <Button
+            android:id="@+id/btnSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/search" />
+
+        <com.model.tool.view.MVEditTextWithDel
+            android:id="@+id/etValue"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2sp"
+            android:layout_marginRight="2sp"
+            android:layout_toLeftOf="@id/btnSearch"
+            android:layout_toRightOf="@id/spKind"
+            android:inputType="text"
+            android:singleLine="true" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/layButtom"
+        android:layout_below="@id/laySearch"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#CD853F"
+            android:gravity="center" >
+
+            <TextView
+                android:id="@+id/num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5sp"
+                android:textColor="#ffffff"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/content"
+                android:layout_width="fill_parent"
+                android:layout_height="30sp"
+                android:layout_marginRight="5sp"
+                android:layout_toRightOf="@id/num"
+                android:gravity="center"
+                android:textColor="#ffffff"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="5sp"
+            android:layout_marginRight="5sp"
+            android:background="#ffffff"
+            android:cacheColorHint="#00000000"
+            android:scrollingCache="false" >
+        </ListView>
+    </LinearLayout>
+
+</RelativeLayout>

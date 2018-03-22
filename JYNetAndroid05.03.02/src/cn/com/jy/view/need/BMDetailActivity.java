@@ -3,12 +3,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.com.jy.activity.R;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTImgHelper;
 import cn.com.jy.model.helper.MTSQLiteHelper;
+
+import cn.com.jy.activity.R;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -203,6 +204,7 @@ public class BMDetailActivity extends Activity implements OnClickListener{
                     "<td >业务编号</td>" +
                     "<td >条码信息</td>" +
                     "<td >提箱地</td>" +
+                    "<td >提箱时间</td>" +
                     "<td >返到中方口岸时间</td>" +
                     "<td >返到口岸库房时间</td>" +
                     "<td >口岸换装时间</td>" +

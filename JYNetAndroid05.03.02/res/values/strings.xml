@@ -39,8 +39,8 @@
     <string name="action_mile_management">里程管理</string>
     <string name="action_auto_focus">自动对焦</string>
     <!-- 04.功能提示 -->
-    <string name="tip_id">账  号</string>
-    <string name="tip_pwd">密  码</string>
+    <string name="tip_id">账号</string>
+    <string name="tip_pwd">密码</string>
     <string name="tip_ensure">确  认</string>
     <string name="tip_name">电  话</string>
     <string name="tip_call">昵  称</string>
@@ -63,6 +63,9 @@
     
     
     
+    <string name="ok">确认</string>
+    <string name="delete">删除</string>
+    <string name="no">取消</string>
     <string name="tip_dialog_wait">请等待 ..</string>
     <string name="tip_dialog_done">正在访问..</string>
     <string name="tip_state">状&#160;&#160;态</string>
@@ -77,6 +80,9 @@
     <string name="tip_bid">业务编号</string>
     
     <string name="tip_success">成功</string>
+    <string name="tip_nodata">未查到可用数据</string>
+    <string name="tip_changing">数据变更中，稍后尝试</string>
+    <string name="tip_error">未知错误</string>
     <string name="tip_fail">失败</string>
     <string name="tip_exit">退出？</string>
     <string name="tip_null">为空</string>
@@ -155,16 +161,6 @@
     <string name="cargostatusport">货物状态</string>
     <string name="left">L</string>
     <string name="right">向右滑动</string>
-
     
-    
-    
-    
-    
-    
-    
-    
-    
-
     <string name="t1">1</string>
 </resources>

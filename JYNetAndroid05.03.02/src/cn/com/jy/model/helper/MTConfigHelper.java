@@ -1,9 +1,7 @@
 package cn.com.jy.model.helper;
-
-import android.R;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Environment;
 import android.text.Editable;
@@ -31,7 +29,7 @@ public class MTConfigHelper {
 								CONFIG_SELF_WNOTE="wnote";
 	
 	public static final String  SPACE="";
-	public static final	int 	NTAG_SUCCESS=1,NTAG_FAIL=2;
+	public static final	int 	NTAG_SUCCESS=1,NTAG_FAIL=2,NTAG_NODATA=3,NTAG_CHANGING=4;
 	//	跳转轨迹;
 	public static final int		NTRACK_GGOODS_GID_TO=20;
 	public static final int		NTRACK_GGOODS_OID_TO=21;
@@ -123,15 +121,6 @@ public class MTConfigHelper {
 			}
 		});
 	}
-	public void giveTip(Context	mContext){
-		Builder builder=new Builder(mContext);
-		builder.setTitle("提示");
-		builder.setMessage("前四个功能点尚在维护....");
-		builder.setNegativeButton(R.string.no, null);
-		builder.create();
-		builder.show();
-	}
-	
 	
 	//	数据的标准化;
 	public String setDataFormat(EditText et){
@@ -204,6 +193,12 @@ public class MTConfigHelper {
 		return gid.substring(ncharlength-count, ncharlength);
 	}
 	//	变色内容;
+	@SuppressWarnings("deprecation")
+	public void setViewDrawable(boolean flag,Resources resources,View view,int drawable1,int drawable2){
+		if(!flag) view.setBackgroundDrawable(resources.getDrawable(drawable1));
+		else view.setBackgroundDrawable(resources.getDrawable(drawable2));
+	}
+	//
 	public void setViewColor(boolean flag,View view,String color1,String color2){
 		if(flag){
 			view.setBackgroundColor(Color.parseColor(color1));

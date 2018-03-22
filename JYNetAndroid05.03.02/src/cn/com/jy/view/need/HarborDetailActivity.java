@@ -3,12 +3,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.com.jy.activity.R;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTImgHelper;
 import cn.com.jy.model.helper.MTSQLiteHelper;
+
+import cn.com.jy.activity.R;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -23,6 +24,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -133,6 +135,7 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
         doLoadData(size);
         //  提货信息路径;
         folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"harbor"+File.separator+gid;
+        Log.e("path",folderPath+":"+imgs);
         //	承装图片的容器;
         if(size>0){
             listBD		=	mImgHelper.getBitmap01_2(folderPath, imgs);

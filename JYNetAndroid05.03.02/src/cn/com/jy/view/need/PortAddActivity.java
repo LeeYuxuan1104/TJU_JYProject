@@ -22,16 +22,18 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Calendar;
 
-import cn.com.jy.activity.R;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTGetTextUtil;
 import cn.com.jy.model.helper.MTSQLiteHelper;
 import cn.com.jy.model.helper.MTSharedpreferenceHelper;
+
+import cn.com.jy.activity.R;
 
 public class PortAddActivity extends Activity implements View.OnClickListener {
     private Context mContext;
@@ -39,7 +41,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener {
     /*控件内容*/
     private TextView vTopic, vBack, vFunction, btnBack;
     private LinearLayout layTrain, layTruck;
-    private String barcode, cargostatusport, slkind, img;
+    private String barcode, cargostatusport, slkind, img,sSize,folderPath;
     private Button vOk, btptoportdate, btpreinvoicedate_port, btpjinchangdate, btppackingtime, btbssj, btbssj2,
             btstartdate, btdgtrainstartdate;
     private ProgressDialog mDialog;
@@ -159,12 +161,14 @@ public class PortAddActivity extends Activity implements View.OnClickListener {
 
     private void getInfo() {
         mIntent = getIntent();
-        Bundle mBundle = mIntent.getExtras();
-        barcode = mBundle.getString("barcode");
+        Bundle mBundle  = mIntent.getExtras();
+        barcode         = mBundle.getString("barcode");
         cargostatusport = mBundle.getString("cargostatusport");
-        slkind = mBundle.getString("slkind");
-        busiinvcode = mBundle.getString("busiinvcode");
-        img = mBundle.getString("imgs");
+        slkind          = mBundle.getString("slkind");
+        busiinvcode     = mBundle.getString("busiinvcode");
+        img             = mBundle.getString("imgs");
+        folderPath      = mBundle.getString("folderPath");
+        sSize           = mBundle.getString("sSize");
     }
 
     @Override
@@ -221,8 +225,18 @@ public class PortAddActivity extends Activity implements View.OnClickListener {
         int nDay = calendar.get(Calendar.DAY_OF_MONTH);
         int nHour = calendar.get(Calendar.HOUR_OF_DAY);
         int nMinute = calendar.get(Calendar.MINUTE);
-
-        date = nYear + "年" + (nMonth + 1) + "月" + nDay + "日";
+        String sMonth,sDay;
+        if(nMonth+1<10){
+            sMonth="0"+(nMonth + 1);
+        }else {
+            sMonth=(nMonth + 1)+"";
+        }
+        if(nDay<10){
+            sDay="0"+nDay;
+        }else {
+            sDay=nDay+"";
+        }
+        date = nYear + "年" + sMonth + "月" + sDay + "日";
         time = nHour + "时" + nMinute + "分";
         datePicker.init(nYear, nMonth, nDay, new DatePicker.OnDateChangedListener() {
 
@@ -230,7 +244,18 @@ public class PortAddActivity extends Activity implements View.OnClickListener {
             public void onDateChanged(DatePicker view, int year,
                                       int monthOfYear, int dayOfMonth) {
                 // 日历控件;
-                date = year + "年" + (monthOfYear + 1) + "月" + dayOfMonth + "日";
+                String sMonth,sDay;
+                if(monthOfYear+1<10){
+                    sMonth="0"+(monthOfYear + 1);
+                }else {
+                    sMonth=(monthOfYear + 1)+"";
+                }
+                if(dayOfMonth<10){
+                    sDay="0"+dayOfMonth;
+                }else {
+                    sDay=dayOfMonth+"";
+                }
+                date = year + "年" + sMonth + "月" + sDay + "日";
             }
         });
 
@@ -309,7 +334,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener {
                             "发车时间:" + startdate + "\r\n";
         }
         message += "货物状态:" + cargostatusport + "\r\n" +//   货物状态
-                "图:" + img;        //   图
+                "图片张数:" + sSize;        //   图
         vBuilder.setMessage(message);
         vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 
@@ -341,6 +366,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener {
             String url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":" + MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM + "/port";
             String param = null;
             try {
+                uploadDrawMap(img);
                 param =
                         "operType=1" +
                                 "&barcode=" + barcode +
@@ -425,6 +451,24 @@ public class PortAddActivity extends Activity implements View.OnClickListener {
         if (mThread != null) {
             mThread.interrupt();
             mThread = null;
+        }
+    }
+    private void uploadDrawMap(String paths) {
+        String[] names = null;
+
+        if (paths.contains("_")) {
+            names = paths.split("_");
+        } else {
+            names = new String[1];
+            names[0] = paths;
+        }
+        if (names != null) {
+            for (String name : names) {
+                String path = folderPath + File.separator + name + ".jpg";
+                String url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":" + MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM + "/upPhoto";
+                String response = mGetOrPostHelper.uploadFile(url, path, name);
+                Log.i("MyLog", "response=" + response);
+            }
         }
     }
 }

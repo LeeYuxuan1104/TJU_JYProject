@@ -8,10 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cn.com.jy.activity.R;
 import cn.com.jy.model.helper.FileHelper;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTSQLiteHelper;
+
+import cn.com.jy.activity.R;
 
 import android.app.Activity;
 import android.content.Context;
@@ -95,7 +96,7 @@ public class PHistoryActivity extends Activity implements OnClickListener {
             @Override
             public void onItemClick(AdapterView<?> adapter, View view, int position,
                                     long id) {
-                Intent intent = new Intent(PHistoryActivity.this, PDetailActivity.class);
+                Intent intent = new Intent(PHistoryActivity.this, PDetail2Activity.class);
                 Bundle bundle = new Bundle();
                 String  _id		=mList.get(position).get("_id");
                 String  img		=mList.get(position).get("img");
@@ -131,8 +132,7 @@ public class PHistoryActivity extends Activity implements OnClickListener {
             String _id		=	mCursor.getString(mCursor.getColumnIndex("_id")).toString();
             String barcode	=	mCursor.getString(mCursor.getColumnIndex("barcode")).toString();
             String img		=	mCursor.getString(mCursor.getColumnIndex("img")).toString();
-            //String busiinvcode=	mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
-            String busiinvcode=	"mCursor";
+            String busiinvcode=	mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
             if(mSetTmp.add(busiinvcode)){
                 mListBid.add(busiinvcode);
             }

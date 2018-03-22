@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -19,16 +20,18 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Calendar;
 
-import cn.com.jy.activity.R;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTGetTextUtil;
 import cn.com.jy.model.helper.MTSQLiteHelper;
 import cn.com.jy.model.helper.MTSharedpreferenceHelper;
+
+import cn.com.jy.activity.R;
 
 @SuppressLint("HandlerLeak")
 public class BoxAddActivity extends Activity implements View.OnClickListener {
@@ -48,7 +51,7 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
     private EditText etecarryaddress,etechangenumber;
     private String ecarryaddress,ecarrydate,echinaporttime,eportstorageroomtime,etimechangeofport,
             echangenumber,efeeofflinetime,erailwayofflinetime,eactualreturntime,cargostatusbox,
-            barcode,img,busiinvcode;
+            barcode,img,sSize,busiinvcode,folderPath;
 
     Handler mHandler = new Handler() {
         @Override
@@ -118,12 +121,14 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
         bteactualreturntime.setOnClickListener(this);
     }
     private void getInfo(){
-        mIntent		  =getIntent();
-        Bundle mBundle=mIntent.getExtras();
-        barcode	  	  =mBundle.getString("barcode");
-        cargostatusbox=mBundle.getString("cargostatusbox");
-        img 	  	  =mBundle.getString("imgs");
-        busiinvcode 	  	  =mBundle.getString("busiinvcode");
+        mIntent		    =   getIntent();
+        Bundle mBundle  =   mIntent.getExtras();
+        barcode	  	    =   mBundle.getString("barcode");
+        cargostatusbox  =   mBundle.getString("cargostatusbox");
+        img 	  	    =   mBundle.getString("imgs");
+        folderPath 	  	    =   mBundle.getString("folderPath");
+        sSize           =   mBundle.getString("sSize");
+        busiinvcode 	=   mBundle.getString("busiinvcode");
     }
     private void closeThread() {
         if (mThread != null) {
@@ -166,24 +171,34 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
                 break;
         }
     }
-    private void setViewDate(Context mContext,final Button btn){
-        AlertDialog.Builder vBuilder   = new AlertDialog.Builder(mContext);
-		/*布局控件*/
-        View 	   view 	  = getLayoutInflater().inflate(R.layout.activity_datatimepicker, null);
+    private void setViewDate(Context mContext, final Button btn) {
+        AlertDialog.Builder vBuilder = new AlertDialog.Builder(mContext);
+        /*布局控件*/
+        View view = getLayoutInflater().inflate(R.layout.activity_datatimepicker, null);
         vBuilder.setTitle("设置时间");
         vBuilder.setView(view);
-		/*时间日期有关控件*/
+        /*时间日期有关控件*/
         DatePicker datePicker = (DatePicker) view.findViewById(R.id.dpPicker);
         TimePicker timePicker = (TimePicker) view.findViewById(R.id.tpPicker);
-        Calendar calendar   = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
 
-        int 	   nYear 	  = calendar.get(Calendar.YEAR);
-        int 	   nMonth 	  = calendar.get(Calendar.MONTH);
-        int 	   nDay 	  = calendar.get(Calendar.DAY_OF_MONTH);
-        int 	   nHour 	  = calendar.get(Calendar.HOUR_OF_DAY);
-        int 	   nMinute 	  = calendar.get(Calendar.MINUTE);
-
-        date = nYear + "年" + (nMonth + 1) + "月" + nDay + "日";
+        int nYear = calendar.get(Calendar.YEAR);
+        int nMonth = calendar.get(Calendar.MONTH);
+        int nDay = calendar.get(Calendar.DAY_OF_MONTH);
+        int nHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int nMinute = calendar.get(Calendar.MINUTE);
+        String sMonth,sDay;
+        if(nMonth+1<10){
+            sMonth="0"+(nMonth + 1);
+        }else {
+            sMonth=(nMonth + 1)+"";
+        }
+        if(nDay<10){
+            sDay="0"+nDay;
+        }else {
+            sDay=nDay+"";
+        }
+        date = nYear + "年" + sMonth + "月" + sDay + "日";
         time = nHour + "时" + nMinute + "分";
         datePicker.init(nYear, nMonth, nDay, new DatePicker.OnDateChangedListener() {
 
@@ -191,7 +206,18 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
             public void onDateChanged(DatePicker view, int year,
                                       int monthOfYear, int dayOfMonth) {
                 // 日历控件;
-                date = year + "年" + (monthOfYear + 1) + "月" + dayOfMonth + "日";
+                String sMonth,sDay;
+                if(monthOfYear+1<10){
+                    sMonth="0"+(monthOfYear + 1);
+                }else {
+                    sMonth=(monthOfYear + 1)+"";
+                }
+                if(dayOfMonth<10){
+                    sDay="0"+dayOfMonth;
+                }else {
+                    sDay=dayOfMonth+"";
+                }
+                date = year + "年" + sMonth + "月" + sDay + "日";
             }
         });
 
@@ -241,7 +267,7 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
                 "实际回空时间:"+eactualreturntime+"\r\n";
 
         message+="货物状态:"+cargostatusbox+"\r\n"+//	货物状态
-                "图:"+img ;		//	图
+                "图片张数:"+sSize ;		//	图
         vBuilder.setMessage(message);
         vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 
@@ -277,6 +303,8 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
             url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":" + MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM + "/box";
             //url        =  "http://172.23.24.155:"+"8080"+"/JYTest02/harbor";
             wid = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
+            Log.e("img", img);
+            uploadDrawMap(img);
             try {
                 param = "operType=1&" +
                         "barcode=" + barcode + "&" +
@@ -328,7 +356,25 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
                                 "'"+busiinvcode+"')";
                 mDB.execSQL(sql);
             }
-            mHandler.sendEmptyMessage(MTConfigHelper.NTAG_SUCCESS);
+            mHandler.sendEmptyMessage(nFlag);
+        }
+    }
+    private void uploadDrawMap(String paths){
+        String[] names = null;
+
+        if (paths.contains("_")){
+            names		=	paths.split("_");
+        }else {
+            names		=	new String[1];
+            names[0]	=	paths;
+        }
+        if(names!=null){
+            for(String name:names){
+                String path		=	folderPath+ File.separator+name+".jpg";
+                String url		=	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
+                String response	=	mGetOrPostHelper.uploadFile(url,path,name);
+                Log.i("MyLog", "response="+response);
+            }
         }
     }
 }

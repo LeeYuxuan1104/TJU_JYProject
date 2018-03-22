@@ -39,14 +39,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import cn.com.jy.activity.R;
 import cn.com.jy.model.entity.MEFile;
 import cn.com.jy.model.helper.FileHelper;
 import cn.com.jy.model.helper.MTConfigHelper;
@@ -57,6 +49,15 @@ import cn.com.jy.model.helper.MTImgHelper;
 import cn.com.jy.model.helper.MTSQLiteHelper;
 import cn.com.jy.model.helper.MTSharedpreferenceHelper;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import cn.com.jy.activity.R;
+
 public class HarborInformationActivity extends Activity implements OnClickListener {
     private ArrayList<String> list;
     private Context mContext;
@@ -64,10 +65,10 @@ public class HarborInformationActivity extends Activity implements OnClickListen
     private TextView tvTopic, tvImgCount;
     private EditText etSearch;
     private String wid;
-    private TextView btnDetail;
+    private TextView btnDetail, vD1;
     private Button mGsimg, btnAdd,
             btnCode, btnSearch;
-    private String bid,gid, gstate, sSize;
+    private String bid, gid, gstate, sSize;
     private Intent mIntent;
     private ListView mListView;
     private Spinner mState;
@@ -77,6 +78,8 @@ public class HarborInformationActivity extends Activity implements OnClickListen
     private ArrayList<MEFile> listfile;
     //  TODO 02.修改的相关内容;
     private LoadInfoThread mThread; // 线程内容;
+    private final String TAG_AUTO = "自动查询", TAG_MANUAL = "手动输入";
+    private String operkind;
     // 帮助类;
     private MTConfigHelper mConfigHelper;
     private MTGetOrPostHelper mGetOrPostHelper;
@@ -90,20 +93,30 @@ public class HarborInformationActivity extends Activity implements OnClickListen
     private String saveDir = Environment.getExternalStorageDirectory()
             .getPath() + File.separator + "jyFile", saveFolder = "photo", folderPath, // 文件夹路径;
             filePath, // 文件路径;
-            tmpPath, gsimg; // 临时路径;
+            tmpPath, gsimg, simg; // 临时路径;
+    private String hasSubmit = "0";
     @SuppressLint("HandlerLeak")
     Handler myHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             mDialog.dismiss();
             switch (msg.what) {
+                // 01.成功;
                 case MTConfigHelper.NTAG_SUCCESS:
                     Toast.makeText(mContext, R.string.tip_success, Toast.LENGTH_SHORT).show();
                     mtFileHelper.fileDelAll();
                     break;
-                //  02.失败;
+                // 02.失败;
                 case MTConfigHelper.NTAG_FAIL:
-                    Toast.makeText(mContext, R.string.tip_fail, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, R.string.tip_error, Toast.LENGTH_LONG).show();
+                    break;
+                // 03.没有数据;
+                case MTConfigHelper.NTAG_NODATA:
+                    Toast.makeText(mContext, R.string.tip_nodata, Toast.LENGTH_LONG).show();
+                    break;
+                // 04.变更中;
+                case MTConfigHelper.NTAG_CHANGING:
+                    Toast.makeText(mContext, R.string.tip_changing, Toast.LENGTH_LONG).show();
                     break;
                 default:
                     break;
@@ -139,6 +152,7 @@ public class HarborInformationActivity extends Activity implements OnClickListen
         mListView = (ListView) findViewById(R.id.lvResult);
         tvImgCount = (TextView) findViewById(R.id.tvImgCount);
         tvTopic = (TextView) findViewById(R.id.tvTopic);
+        vD1 = (TextView) findViewById(R.id.d1);
         etSearch = (EditText) findViewById(R.id.etSearch);
         mState = (Spinner) findViewById(R.id.gstate);
         btnCode = (Button) findViewById(R.id.btnCode);
@@ -150,7 +164,10 @@ public class HarborInformationActivity extends Activity implements OnClickListen
         btnDetail.setText("历史");
         mSpHelper = new MTSharedpreferenceHelper(mContext, MTConfigHelper.CONFIG_SELF,
                 mContext.MODE_APPEND);
-        tvTopic.setText("口岸");
+        operkind = TAG_AUTO;
+        tvTopic.setText("口岸——操作模式	( " + operkind + " )");
+        chooseOperKind(mContext, tvTopic);
+        processOperKind();
         mGsimg.setOnClickListener(this);
         btnCode.setOnClickListener(this);
         btnSearch.setOnClickListener(this);
@@ -250,8 +267,7 @@ public class HarborInformationActivity extends Activity implements OnClickListen
                 && resultCode == MTConfigHelper.NTRACK_FLUSH_TO_MENU) {
             String gid = intent.getStringExtra("bid");
             etSearch.setText(gid);
-        }
-        else if (requestCode == MTConfigHelper.NTRACK_GGOODS_PHOTO_TO
+        } else if (requestCode == MTConfigHelper.NTRACK_GGOODS_PHOTO_TO
                 && resultCode == -1) {
             Toast.makeText(mContext, "拍照完成", Toast.LENGTH_SHORT).show();
             mImgHelper.compressPicture(tmpPath, filePath);
@@ -262,7 +278,7 @@ public class HarborInformationActivity extends Activity implements OnClickListen
             // TODO 修改的内容;
             mtFileHelper.fileAdd(meFile);
             showImgCount();
-        }else if (requestCode == 1) {
+        } else if (requestCode == 1) {
             if (resultCode == 1) {
                 doResetParam();
             }
@@ -284,6 +300,7 @@ public class HarborInformationActivity extends Activity implements OnClickListen
 
             case R.id.btnSearch:
                 if (mThread == null) {
+                    hasSubmit = "0";
                     int nSize = list.size();
                     if (nSize != 0) {
                         list.clear();
@@ -305,134 +322,237 @@ public class HarborInformationActivity extends Activity implements OnClickListen
                 startActivity(mIntent);
                 break;
             case R.id.btnAdd:
-                if (list.size() > 0) {
-                    mIntent = new Intent(mContext, HarborAddActivity.class);
-                    mBundle = new Bundle();
-                    mBundle.putString("barcode", gid);
-                    mBundle.putString("cargostatusseaport", gstate);
-                    mBundle.putString("busiinvcode", bid);
-                    gsimg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(), "_");
-                    if (gsimg.equals("")) gsimg = "0张";
-                    mBundle.putString("imgs", gsimg);
-                    mIntent.putExtras(mBundle);
-                    startActivityForResult(mIntent, 1);
-                } else Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
-
+                if (operkind.equals(TAG_AUTO)) {
+                    if (hasSubmit.equals("1")) {
+                        Toast.makeText(mContext, "条码已被使用", Toast.LENGTH_SHORT).show();
+                    } else if (list.size() > 0) {
+                        mIntent = new Intent(mContext, HarborAddActivity.class);
+                        mBundle = new Bundle();
+                        mBundle.putString("barcode", gid);
+                        mBundle.putString("cargostatusseaport", gstate);
+                        mBundle.putString("busiinvcode", bid);
+                        mBundle.putString("folderPath", folderPath);
+                        gsimg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(), "_");
+                        if (gsimg.equals("")) gsimg = "未拍照";
+                        mBundle.putString("imgs", gsimg);
+                        mBundle.putString("sSize", sSize);
+                        mIntent.putExtras(mBundle);
+                        startActivityForResult(mIntent, 1);
+                    } else Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
+                } else if (operkind.equals(TAG_MANUAL)) {
+                    String tmp = etSearch.getText().toString().trim();
+                    if (!tmp.equals("")) {
+                        bid = tmp;
+                        gid = mConfigHelper.getJYE(bid, 5);
+                        if (gid != null) {
+                            mIntent = new Intent(mContext, HarborAddActivity.class);
+                            mBundle = new Bundle();
+                            mBundle.putString("barcode", gid);
+                            mBundle.putString("cargostatusseaport", gstate);
+                            mBundle.putString("busiinvcode", bid);
+                            mBundle.putString("folderPath", folderPath);
+                            gsimg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(), "_");
+                            if (gsimg.equals("")) gsimg = "未拍照";
+                            mBundle.putString("imgs", gsimg);
+                            mBundle.putString("sSize", sSize);
+                            mIntent.putExtras(mBundle);
+                            startActivityForResult(mIntent, 1);
+                        } else Toast.makeText(mContext, "码值不正确", Toast.LENGTH_SHORT).show();
+                    } else Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
+                }
                 break;
             default:
                 break;
         }
     }
 
+    //    public void getPhoto_Ggoods() {
+//        File file;
+//        if (mConfigHelper.getfState().equals(Environment.MEDIA_MOUNTED)) {
+//            if (bid != null && gid != null) {
+//                folderPath = mConfigHelper.getfParentPath() + bid
+//                        + File.separator + "harbor" + File.separator + gid;
+//                gsimg = bid + "harbor" + gid + "file"
+//                        + java.lang.System.currentTimeMillis();
+//                file = new File(folderPath);
+//                // 生成文件夹的方式;
+//                if (!file.exists()) {
+//                    file.mkdirs();
+//                }
+//                // 生成2中文件路径:01.临时的 02.永久的
+//                tmpPath = folderPath + File.separator + gsimg + "_tmp.jpg";
+//                filePath = folderPath + File.separator + gsimg + ".jpg";
+//                file = new File(tmpPath);
+//                if (file.exists()) {
+//                    file.delete();
+//                }
+//                if (!file.exists()) {
+//                    try {
+//                        file.createNewFile();
+//                    } catch (IOException e) {
+//                        Toast.makeText(mContext, "照片创建失败!", Toast.LENGTH_LONG)
+//                                .show();
+//                        return;
+//                    }
+//                }
+//                mIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+//                mIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+//                startActivityForResult(mIntent,
+//                        MTConfigHelper.NTRACK_GGOODS_PHOTO_TO);
+//            } else {
+//                Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
+//            }
+//        } else {
+//            Toast.makeText(mContext, "sdcard无效或没有插入!", Toast.LENGTH_SHORT)
+//                    .show();
+//        }
+//    }
+//	拍照功能;
     public void getPhoto_Ggoods() {
         File file;
         if (mConfigHelper.getfState().equals(Environment.MEDIA_MOUNTED)) {
-            if (bid != null && gid != null) {
-                folderPath = mConfigHelper.getfParentPath() + bid
-                        + File.separator + "harbor" + File.separator + gid;
-                gsimg = bid + "harbor" + gid + "file"
-                        + java.lang.System.currentTimeMillis();
-                file = new File(folderPath);
-                // 生成文件夹的方式;
-                if (!file.exists()) {
-                    file.mkdirs();
-                }
-                // 生成2中文件路径:01.临时的 02.永久的
-                tmpPath = folderPath + File.separator + gsimg + "_tmp.jpg";
-                filePath = folderPath + File.separator + gsimg + ".jpg";
-                file = new File(tmpPath);
-                if (file.exists()) {
-                    file.delete();
-                }
-                if (!file.exists()) {
-                    try {
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        Toast.makeText(mContext, "照片创建失败!", Toast.LENGTH_LONG)
-                                .show();
-                        return;
+            if (operkind.endsWith(TAG_AUTO)) {
+                if (bid != null && gid != null) {
+                    if (hasSubmit.equals("1")) {
+                        Toast.makeText(mContext, "条码已被使用", Toast.LENGTH_SHORT).show();
+                    } else {
+                        folderPath = mConfigHelper.getfParentPath() + bid + File.separator + "harbor" + File.separator + gid;
+                        gsimg = bid + "harbor" + gid + "file" + java.lang.System.currentTimeMillis();
+                        file = new File(folderPath);
+                        //	生成文件夹的方式;
+                        if (!file.exists()) {
+                            file.mkdirs();
+                        }
+                        //	生成2中文件路径:01.临时的 02.永久的
+                        tmpPath = folderPath + File.separator + gsimg + "_tmp.jpg";
+                        filePath = folderPath + File.separator + gsimg + ".jpg";
+                        doPhoto(mContext, mIntent, tmpPath, filePath);
                     }
-                }
-                mIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-                mIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-                startActivityForResult(mIntent,
-                        MTConfigHelper.NTRACK_GGOODS_PHOTO_TO);
-            } else {
-                Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
+                } else Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
+            } else if (operkind.equals(TAG_MANUAL)) {
+                String tmp = etSearch.getText().toString().trim();
+                if (!tmp.equals("")) {
+                    bid = tmp;
+                    gid = mConfigHelper.getJYE(bid, 5);
+                    if (gid != null) {
+
+                        folderPath = mConfigHelper.getfParentPath() + bid + File.separator + "harbor" + File.separator + gid;
+                        gsimg = bid + "harbor" + gid + "file" + java.lang.System.currentTimeMillis();
+                        file = new File(folderPath);
+                        //	生成文件夹的方式;
+                        if (!file.exists()) {
+                            file.mkdirs();
+                        }
+                        //	生成2中文件路径:01.临时的 02.永久的
+                        tmpPath = folderPath + File.separator + gsimg + "_tmp.jpg";
+                        filePath = folderPath + File.separator + gsimg + ".jpg";
+                        doPhoto(mContext, mIntent, tmpPath, filePath);
+                    } else Toast.makeText(mContext, "码值不正确", Toast.LENGTH_SHORT).show();
+                } else Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            Toast.makeText(mContext, "sdcard无效或没有插入!", Toast.LENGTH_SHORT)
-                    .show();
-        }
+        } else Toast.makeText(mContext, "sdcard无效或没有插入!", Toast.LENGTH_SHORT).show();
     }
 
-    public class LoadInfoThread extends Thread{
+
+    private void doPhoto(Context context, Intent intent, String tmppath, String filepath) {
+        File file = new File(tmppath);
+        if (file.exists()) {
+            file.delete();
+        }
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                Toast.makeText(context, "照片创建失败!", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+        intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+        startActivityForResult(intent, MTConfigHelper.NTRACK_GGOODS_PHOTO_TO);
+    }
+
+    public class LoadInfoThread extends Thread {
         private String url,
                 param,
-                response
-                        ;
+                response;
+
         @Override
         public void run() {
-            url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods";
+            url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":" + MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM + "/goods";
             //url        =  "http://172.23.24.155:8080/JYTest02/goods2";
-            param    =  "operType=4&barcode="+gid;
-            response=   mGetOrPostHelper.sendGet(url,param);
-            int nFlag=  MTConfigHelper.NTAG_FAIL;
-            JSONArray res;
-            JSONObject body;
-            if(!response.trim().equalsIgnoreCase("fail")) {
+            param = "operType=4&barcode=" + gid;
+            response = mGetOrPostHelper.sendGet(url, param);
+            int nFlag = MTConfigHelper.NTAG_FAIL;
+
+            if (!response.trim().equalsIgnoreCase("fail")) {
                 nFlag = MTConfigHelper.NTAG_SUCCESS;
-                try {
-                    res = new JSONArray(response);
-                    body = res.getJSONObject(0);
-                } catch (JSONException e) {
-                    res = null;
-                    body = null;
-                }
-                if (body != null) {
+                if (response.trim().equalsIgnoreCase("0001")) {
+                    nFlag = MTConfigHelper.NTAG_NODATA;
+                } else if (response.trim().equalsIgnoreCase("0002")) {
+                    nFlag = MTConfigHelper.NTAG_CHANGING;
+                } else if (response.trim().equalsIgnoreCase("0003")) {
+                    nFlag = MTConfigHelper.NTAG_FAIL;
+                } else {
+                    JSONArray res;
+                    JSONObject body;
                     try {
-                        bid = body.getString("busiinvcode");
-                        String tradecode = body.getString("tradecode");
-                        String wcode = body.getString("wcode");
-                        String cname = body.getString("cname");
-                        String cid = body.getString("cid");
-                        String csize = body.getString("csize");
-                        String ctype = body.getString("ctype");
-                        String sealno = body.getString("sealno");
-                        String pieces = body.getString("pieces");
-                        String goodsdesc = body.getString("goodsdesc");
-                        String grossweight = body.getString("grossweight");
-                        String grossweightjw = body.getString("grossweightjw");
-                        String grossweighgn = body.getString("grossweighgn");
-                        String volume = body.getString("volume");
-                        String length = body.getString("length");
-                        String width = body.getString("width");
-                        String height = body.getString("height");
+                        res = new JSONArray(response);
+                        body = res.getJSONObject(0);
 
-                        gid = etSearch.getText().toString();
-                        list.add("业务编号:" + bid);
-                        list.add("业务类型编号:" + tradecode);
-                        list.add("建单人:" + wcode);
-                        list.add("品名:" + cname);
-                        list.add("箱号:" + cid);
-                        list.add("箱尺寸:" + csize);
-                        list.add("箱型:" + ctype);
-                        list.add("铅封号:" + sealno);
-                        list.add("件数:" + pieces);
-                        list.add("包装类型:" + goodsdesc);
-                        list.add("毛重量:" + grossweight);
-                        list.add("毛重-境外(KGS):" + grossweightjw);
-                        list.add("毛重-国内(KGS):" + grossweighgn);
-                        list.add("体积（CBM）:" + volume);
-                        list.add("长(CM):" + length);
-                        list.add("宽(CM):" + width);
-                        list.add("高(CM):" + height);
+                        if (body != null) {
+                            try {
+                                bid = body.getString("busiinvcode");
+                                String tradecode = body.getString("tradecode");
+                                String wcode = body.getString("wcode");
+                                String cname = body.getString("cname");
+                                String cid = body.getString("cid");
+                                String csize = body.getString("csize");
+                                String ctype = body.getString("ctype");
+                                String sealno = body.getString("sealno");
+                                String pieces = body.getString("pieces");
+                                String goodsdesc = body.getString("goodsdesc");
+                                String grossweight = body.getString("grossweight");
+                                String grossweightjw = body.getString("grossweightjw");
+                                String grossweighgn = body.getString("grossweighgn");
+                                String volume = body.getString("volume");
+                                String length = body.getString("length");
+                                String width = body.getString("width");
+                                String height = body.getString("height");
 
+                                gid = etSearch.getText().toString();
+                                if (!body.getString("hasSubmit").equals("无")) {
+                                    hasSubmit = "1";
+                                }
+
+                                list.add("业务编号:" + bid);
+                                list.add("业务类型编号:" + tradecode);
+                                list.add("建单人:" + wcode);
+                                list.add("品名:" + cname);
+                                list.add("箱号:" + cid);
+                                list.add("箱尺寸:" + csize);
+                                list.add("箱型:" + ctype);
+                                list.add("铅封号:" + sealno);
+                                list.add("件数:" + pieces);
+                                list.add("包装类型:" + goodsdesc);
+                                list.add("毛重量:" + grossweight);
+                                list.add("毛重-境外(KGS):" + grossweightjw);
+                                list.add("毛重-国内(KGS):" + grossweighgn);
+                                list.add("体积（CBM）:" + volume);
+                                list.add("长(CM):" + length);
+                                list.add("宽(CM):" + width);
+                                list.add("高(CM):" + height);
+
+                            } catch (JSONException e) {
+                                nFlag = MTConfigHelper.NTAG_FAIL;
+                                Log.e("getdata", "run: ", e);
+                            }
+                        }
                     } catch (JSONException e) {
                         nFlag = MTConfigHelper.NTAG_FAIL;
-                        Log.e("getdata", "run: ", e);
                     }
                 }
+
 
             }
             myHandler.sendEmptyMessage(nFlag);
@@ -450,17 +570,17 @@ public class HarborInformationActivity extends Activity implements OnClickListen
         gstate = "正常";
         mState.setSelection(0);
         bid = null;
-        gid=null;
+        gid = null;
     }
 
     private void showImgCount() {
-    	folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"harbor"+File.separator+gid;
+        folderPath = mConfigHelper.getfParentPath() + bid + File.separator + "harbor" + File.separator + gid;
         sSize = String.valueOf(mtFileHelper.getListfiles().size());
         tvImgCount.setText(sSize);
     }
 
     private void showData() {
-    	showImgCount();
+        showImgCount();
         mAdapter = new ArrayAdapter<String>(mContext, R.layout.item02, R.id.tvTopic, list);
         //  显示的列表和适配器绑定;
         mListView.setAdapter(mAdapter);
@@ -483,9 +603,42 @@ public class HarborInformationActivity extends Activity implements OnClickListen
         }
         super.onDestroy();
     }
+
     @Override
     protected void onResume() {
-    	super.onResume();
-    	showData();
+        super.onResume();
+        showData();
+    }
+
+    private void chooseOperKind(Context context, final TextView vTopic) {
+        operkind = TAG_AUTO;
+        Builder vBuilder = new Builder(context);
+        vBuilder.setTitle("选择操作方式");
+        final String[] kinds = {TAG_AUTO, TAG_MANUAL};
+
+        vBuilder.setItems(kinds, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface arg0, int position) {
+                operkind = kinds[position];
+                vTopic.setText("口岸——操作模式	( " + operkind + " )");
+                processOperKind();
+            }
+        });
+
+        vBuilder.setNegativeButton(R.string.action_no, null);
+        vBuilder.create();
+        vBuilder.show();
+    }
+
+    //	进行相应的内容;
+    private void processOperKind() {
+        if (operkind.equals(TAG_AUTO)) {
+            vD1.setVisibility(View.VISIBLE);
+            btnSearch.setVisibility(View.VISIBLE);
+        } else if (operkind.equals(TAG_MANUAL)) {
+            vD1.setVisibility(View.GONE);
+            btnSearch.setVisibility(View.GONE);
+        }
     }
 }

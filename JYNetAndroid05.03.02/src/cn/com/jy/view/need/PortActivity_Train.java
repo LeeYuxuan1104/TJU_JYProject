@@ -21,9 +21,10 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-import cn.com.jy.activity.R;
 import cn.com.jy.model.entity.Trainorder;
 import cn.com.jy.model.helper.MTGetTextUtil;
+
+import cn.com.jy.activity.R;
 
 public class PortActivity_Train extends Activity implements OnClickListener,TextView.OnEditorActionListener,View.OnTouchListener{
 	private Button btnsubmit,btncancle;

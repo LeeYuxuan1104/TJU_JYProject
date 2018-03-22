@@ -19,16 +19,18 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Calendar;
 
-import cn.com.jy.activity.R;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTGetTextUtil;
 import cn.com.jy.model.helper.MTSQLiteHelper;
 import cn.com.jy.model.helper.MTSharedpreferenceHelper;
+
+import cn.com.jy.activity.R;
 
 public class HarborAddActivity extends Activity implements View.OnClickListener {
     private Context mContext;
@@ -49,7 +51,7 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
 
     private String pfactchportdate,mpackingdate,ppassdate,preloadcarno,
             preloadcarnum,preloaddate,msinglecarnum,msinglecarton,
-            pstartdate,cargostatusseaport,wid,barcode,img,busiinvcode;
+            pstartdate,cargostatusseaport,wid,barcode,img,busiinvcode,sSize,folderPath;
 
     Handler mHandler = new Handler() {
         @Override
@@ -149,24 +151,34 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
                 break;
         }
     }
-    private void setViewDate(Context mContext,final Button btn){
-        AlertDialog.Builder vBuilder   = new AlertDialog.Builder(mContext);
+    private void setViewDate(Context mContext, final Button btn) {
+        AlertDialog.Builder vBuilder = new AlertDialog.Builder(mContext);
         /*布局控件*/
-        View       view       = getLayoutInflater().inflate(R.layout.activity_datatimepicker, null);
+        View view = getLayoutInflater().inflate(R.layout.activity_datatimepicker, null);
         vBuilder.setTitle("设置时间");
         vBuilder.setView(view);
         /*时间日期有关控件*/
         DatePicker datePicker = (DatePicker) view.findViewById(R.id.dpPicker);
         TimePicker timePicker = (TimePicker) view.findViewById(R.id.tpPicker);
-        Calendar calendar   = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
 
-        int        nYear      = calendar.get(Calendar.YEAR);
-        int        nMonth     = calendar.get(Calendar.MONTH);
-        int        nDay       = calendar.get(Calendar.DAY_OF_MONTH);
-        int        nHour      = calendar.get(Calendar.HOUR_OF_DAY);
-        int        nMinute    = calendar.get(Calendar.MINUTE);
-
-        date = nYear + "年" + (nMonth + 1) + "月" + nDay + "日";
+        int nYear = calendar.get(Calendar.YEAR);
+        int nMonth = calendar.get(Calendar.MONTH);
+        int nDay = calendar.get(Calendar.DAY_OF_MONTH);
+        int nHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int nMinute = calendar.get(Calendar.MINUTE);
+        String sMonth,sDay;
+        if(nMonth+1<10){
+            sMonth="0"+(nMonth + 1);
+        }else {
+            sMonth=(nMonth + 1)+"";
+        }
+        if(nDay<10){
+            sDay="0"+nDay;
+        }else {
+            sDay=nDay+"";
+        }
+        date = nYear + "年" + sMonth + "月" + sDay + "日";
         time = nHour + "时" + nMinute + "分";
         datePicker.init(nYear, nMonth, nDay, new DatePicker.OnDateChangedListener() {
 
@@ -174,7 +186,18 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
             public void onDateChanged(DatePicker view, int year,
                                       int monthOfYear, int dayOfMonth) {
                 // 日历控件;
-                date = year + "年" + (monthOfYear + 1) + "月" + dayOfMonth + "日";
+                String sMonth,sDay;
+                if(monthOfYear+1<10){
+                    sMonth="0"+(monthOfYear + 1);
+                }else {
+                    sMonth=(monthOfYear + 1)+"";
+                }
+                if(dayOfMonth<10){
+                    sDay="0"+dayOfMonth;
+                }else {
+                    sDay=dayOfMonth+"";
+                }
+                date = year + "年" + sMonth + "月" + sDay + "日";
             }
         });
 
@@ -205,6 +228,8 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
         barcode       =mBundle.getString("barcode");
         cargostatusseaport=mBundle.getString("cargostatusseaport");
         img           =mBundle.getString("imgs");
+        sSize           =mBundle.getString("sSize");
+        folderPath           =mBundle.getString("folderPath");
         busiinvcode=mBundle.getString("busiinvcode");
     }
     private void getDataInfo(){
@@ -232,7 +257,7 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
                 "发车时间/出境时间:"+pstartdate+"\r\n";
 
         message+="货物状态:"+cargostatusseaport+"\r\n"+//   货物状态
-                "图:"+img ;      //  图
+                "图片张数:"+sSize ;      //  图
         vBuilder.setMessage(message);
         vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 
@@ -268,6 +293,7 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
             url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":" + MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM + "/harbor";
             //url        =  "http://172.23.24.155:"+"8080"+"/JYTest02/harbor";
             wid = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
+            uploadDrawMap(img);
             try {
                 param = "operType=1&" +
                         "barcode=" + URLEncoder.encode(barcode, "utf-8") + "&" +
@@ -284,13 +310,13 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
                         "cargostatusseaport=" + URLEncoder.encode(cargostatusseaport, "utf-8") + "&" +
                         "wid=" + URLEncoder.encode(wid, "utf-8")+ "&" +
                         "busiinvcode="+URLEncoder.encode(busiinvcode, "utf-8");
+                Log.e("dsd", param );
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
 
             response = mGetOrPostHelper.sendGet(url, param);
-            Log.e("aha", url +"::"+param);
-            int nFlag = response.trim().equalsIgnoreCase("success") ? MTConfigHelper.NTAG_SUCCESS : MTConfigHelper.NTAG_FAIL;
+            int nFlag = response.trim().equals("success")?MTConfigHelper.NTAG_SUCCESS : MTConfigHelper.NTAG_FAIL;
             if (nFlag == MTConfigHelper.NTAG_SUCCESS) {
                 sql=
                         "insert into harborinfo (" +
@@ -313,20 +339,38 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
                                 "'"+preloaddate+"'," +
                                 "'"+msinglecarnum+"'," +
                                 "'"+msinglecarton+"'," +
-                                "'"+pstartdate+"'," +
+                                 "'"+pstartdate+"'," +
                                 "'"+cargostatusseaport+"'," +
                                 "'"+img+"'," +
                                 "'"+busiinvcode+"')";
                 mDB.execSQL(sql);
 
             }
-            mHandler.sendEmptyMessage(MTConfigHelper.NTAG_SUCCESS);
+            mHandler.sendEmptyMessage(nFlag);
         }
     }
     private void closeThread() {
         if (mThread != null) {
             mThread.interrupt();
             mThread = null;
+        }
+    }
+    private void uploadDrawMap(String paths){
+        String[] names	=	null;
+
+        if(paths.contains("_")){
+            names		=	paths.split("_");
+        }else {
+            names		=	new String[1];
+            names[0]	=	paths;
+        }
+        if(names!=null){
+            for(String name:names){
+                String path		=	folderPath+ File.separator+name+".jpg";
+                String url		=	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
+                String response	=	mGetOrPostHelper.uploadFile(url,path,name);
+                Log.i("MyLog", "response="+response);
+            }
         }
     }
 }
